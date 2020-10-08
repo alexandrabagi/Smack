@@ -19,6 +19,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.GravityCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.smack.Model.Channel
+import com.example.smack.Model.Message
 import com.example.smack.R
 import com.example.smack.Services.AuthService
 import com.example.smack.Services.MessageService
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         // if we detect it, we use onNewChannel listener which will run on UI thread and extract the properties
         // and creates a new channel
         socket.on("channelCreated", onNewChannel)
+        socket.on("messageCreated", onNewMessage)
 
         val toggle = ActionBarDrawerToggle(
             this, drawer_layout, toolbar,
@@ -68,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
 
         setupAdapters()
-
+  
         if (App.prefs.isLoggedIn) {
             AuthService.findUserByEmail(this, {})
         }
@@ -124,19 +126,51 @@ class MainActivity : AppCompatActivity() {
     fun updateWithChannel() {
         mainChannelName.text = "#${selectedChannel?.name}"
         // download messages for channel
+        if (selectedChannel != null) {
+            MessageService.getMessages(selectedChannel!!.id) { complete ->
+                if (complete) {
+                    for (message in MessageService.messages) {
+                        println(message)
+                    }
+                }
+            }
+        }
     }
 
     private val onNewChannel = Emitter.Listener { args ->
-        // the callback of the listener is on a worker thread
-        // we need to get back on the main thread to update the UI -> runOnUiThread
-        runOnUiThread {
-            val channelName = args[0] as String
-            val channelDescription = args[1] as String
-            val channelId = args[2] as String
+        if (App.prefs.isLoggedIn) {
+            // the callback of the listener is on a worker thread -> we need to get back on the main thread to update the UI -> runOnUiThread
+            runOnUiThread {
+                val channelName = args[0] as String
+                val channelDescription = args[1] as String
+                val channelId = args[2] as String
 
-            val newChannel = Channel(channelName, channelDescription, channelId)
-            MessageService.channels.add(newChannel)
-            channelAdapter.notifyDataSetChanged()
+                val newChannel = Channel(channelName, channelDescription, channelId)
+                MessageService.channels.add(newChannel)
+                channelAdapter.notifyDataSetChanged()
+            }
+        }
+
+    }
+
+    private val onNewMessage = Emitter.Listener { args ->
+        if (App.prefs.isLoggedIn) {
+            runOnUiThread {
+                val channelId = args[2] as String // 1 would be message id
+                if (channelId == selectedChannel?.id) {
+                    val messageBody = args[0] as String
+
+                    val userName = args[3] as String
+                    val userAvatar = args[4] as String
+                    val userAvatarColor = args[5] as String
+                    val id = args[6] as String
+                    val timeStamp = args[7] as String
+
+                    val newMessage = Message(messageBody, userName, channelId, userAvatar,
+                        userAvatarColor, id, timeStamp)
+                    MessageService.messages.add(newMessage) // we only keep messages in memory for the current channel
+                }
+            }
         }
     }
 
@@ -192,7 +226,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun sendMsgBtnClicked(view: View) {
-        hideKeyboard()
+        if (App.prefs.isLoggedIn && messageTextField.text.isNotEmpty() && selectedChannel != null) {
+            val userId = UserDataService.id
+            val channelId = selectedChannel!!.id
+            socket.emit("newMessage", messageTextField.text.toString(), userId, channelId,
+                UserDataService.name, UserDataService.avatarName, UserDataService.avatarName)
+            messageTextField.text.clear()
+            hideKeyboard()
+        }
     }
 
     fun hideKeyboard() {
