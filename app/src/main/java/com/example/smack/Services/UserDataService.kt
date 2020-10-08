@@ -13,7 +13,7 @@ object UserDataService {
 
     fun returnAvatarColor(components: String) : Int {
         // [0.7647058823529411, 0.596078431372549, 0.8666666666666667, 1]
-        // R                    G                   B               alfa
+        // R                    G                  B                alfa
 
         val strippedColor = components
             .replace("[", "")

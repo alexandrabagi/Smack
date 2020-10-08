@@ -1,10 +1,12 @@
 package com.example.smack.Controller
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.example.smack.R
@@ -38,6 +40,7 @@ class CreateUserActivity : AppCompatActivity() {
         }
         val resourceId = resources.getIdentifier(userAvatar, "drawable", packageName)
         createAvatarImageView.setImageResource(resourceId)
+        hideKeyboard()
     }
 
     fun generateColorClicked(view: View) {
@@ -48,6 +51,7 @@ class CreateUserActivity : AppCompatActivity() {
 
         createAvatarImageView.setBackgroundColor(Color.rgb(r, g, b))
 
+        // save for later use / for iOS
         val savedR = r.toDouble() / 255
         val savedG = g.toDouble() / 255
         val savedB = b.toDouble() / 255
@@ -67,21 +71,24 @@ class CreateUserActivity : AppCompatActivity() {
                         if (loginSuccess) {
                             AuthService.createUser(this, userName, email, userAvatar, avatarColor) {createSuccess ->
                                 if (createSuccess) {
-//                                println(UserDataService.name)
-//                                println(UserDataService.avatarName)
-//                                println(UserDataService.avatarColor)
+                                    println(UserDataService.name)
+                                    println(UserDataService.avatarName)
+                                    println(UserDataService.avatarColor)
                                     // sending out a broadcast when createUser is successful
                                     val userDataChanged = Intent(BROADCAST_USER_DATA_CHANGED)
                                     LocalBroadcastManager.getInstance(this).sendBroadcast(userDataChanged)
+                                    println("Broadcast is sent")
                                     enableSpinner(false)
                                     finish()
                                 }
                             }
                         } else {
+                            println("Login is not successful")
                             errorToast()
                         }
                     }
                 } else {
+                    println("Register is not successful")
                     errorToast()
                 }
             }
@@ -108,5 +115,13 @@ class CreateUserActivity : AppCompatActivity() {
         createUserBtn.isEnabled = !enable
         createAvatarImageView.isEnabled = !enable
         backgroundColorBtn.isEnabled = !enable
+    }
+
+    fun hideKeyboard() {
+        val inputManager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+        if (inputManager.isAcceptingText) {
+            inputManager.hideSoftInputFromWindow(currentFocus.windowToken, 0)
+        }
     }
 }

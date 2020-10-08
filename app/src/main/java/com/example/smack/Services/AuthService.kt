@@ -21,6 +21,7 @@ object AuthService {
 
     fun registerUser(context: Context, email: String, password: String, complete: (Boolean) -> Unit) {
 
+        // passing the webrequest
         val jsonBody = JSONObject()
         jsonBody.put("email", email)
         jsonBody.put("password", password)
@@ -56,7 +57,7 @@ object AuthService {
 
         val loginRequest = object: JsonObjectRequest(Method.POST, URL_LOGIN, null, Response.Listener {response ->
             // this is where we parse the JSON object that we are receiving
-            println(response)
+//            println("Response: " + response)
 
             try {
                 userEmail = response.getString("user")
@@ -73,7 +74,7 @@ object AuthService {
 
         }, Response.ErrorListener {error ->
             // this is where we deal with the error
-            Log.d("ERROR", "Could not register user: $error")
+            Log.d("ERROR", "Could not login user: $error")
             complete(false)
         }) {
             override fun getBodyContentType(): String {
