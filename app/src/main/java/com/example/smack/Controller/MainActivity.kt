@@ -66,6 +66,10 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
 
         setupAdapters()
+
+        if (App.prefs.isLoggedIn) {
+            AuthService.findUserByEmail(this, {})
+        }
     }
 
     override fun onResume() {
@@ -84,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context, intent: Intent?) {
             // here we update the nav header UI
             println("Broadcast received")
-            if (AuthService.isLoggedIn) {
+            if (App.prefs.isLoggedIn) {
 //                println("User is logged in")
 //                println(UserDataService.name)
 //                println(UserDataService.email)
@@ -134,7 +138,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loginBtnNavClicked(view: View) {
-        if (AuthService.isLoggedIn) {
+        if (App.prefs.isLoggedIn) {
             // logout
             UserDataService.logout() // => takes care of the data
 
@@ -150,7 +154,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun addChannelClicked(view: View) {
-        if (AuthService.isLoggedIn) {
+        if (App.prefs.isLoggedIn) {
             val builder = AlertDialog.Builder(this)
             val dialogView = layoutInflater.inflate(R.layout.add_channel_dialog, null)
 
