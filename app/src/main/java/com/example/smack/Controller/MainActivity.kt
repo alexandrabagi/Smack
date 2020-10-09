@@ -90,6 +90,20 @@ class MainActivity : AppCompatActivity() {
             updateWithChannel()
         }
 
+        channel_list.setOnItemLongClickListener { _, _, position, _ ->
+            MessageService.deleteChannel(position)
+            channelAdapter.notifyDataSetChanged()
+            if (position > 0) {
+                selectedChannel = MessageService.channels[position-1]
+            } else {
+                selectedChannel = MessageService.channels[position]
+            }
+
+            updateWithChannel()
+            true
+
+        }
+
         LocalBroadcastManager.getInstance(this).registerReceiver(userDataChangeReceiver, IntentFilter(
             BROADCAST_USER_DATA_CHANGED))
     }
@@ -141,9 +155,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-
-        } else {
-            println("Selected channel is null")
         }
     }
 
