@@ -89,12 +89,9 @@ class MainActivity : AppCompatActivity() {
             drawer_layout.closeDrawer(GravityCompat.START)
             updateWithChannel()
         }
-    }
 
-    override fun onResume() {
         LocalBroadcastManager.getInstance(this).registerReceiver(userDataChangeReceiver, IntentFilter(
             BROADCAST_USER_DATA_CHANGED))
-        super.onResume()
     }
 
     override fun onDestroy() {
@@ -186,7 +183,7 @@ class MainActivity : AppCompatActivity() {
                     val newMessage = Message(messageBody, userName, channelId, userAvatar, userAvatarColor,
                         id, timeStamp)
                     MessageService.messages.add(newMessage) // we only keep messages in memory for the current channel
-//                    println("New Message: " + newMessage.message)
+                    println("New Message timestamp: " + newMessage.timeStamp)
 
                     messageAdapter.notifyDataSetChanged()
                     messageListView.smoothScrollToPosition(messageAdapter.itemCount - 1)
@@ -216,6 +213,7 @@ class MainActivity : AppCompatActivity() {
             userImageNavHeader.setImageResource(R.drawable.profiledefault)
             userImageNavHeader.setBackgroundColor(Color.TRANSPARENT)
             loginBtnNavHeader.text = "Login"
+            mainChannelName.text = "Please log in"
         } else {
             val loginIntent = Intent(this, LoginActivity::class.java)
             startActivity(loginIntent)
