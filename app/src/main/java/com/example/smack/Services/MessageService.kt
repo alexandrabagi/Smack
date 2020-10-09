@@ -114,9 +114,4 @@ object MessageService {
     fun deleteChannel(channelIdx: Int) {
         channels.removeAt(channelIdx)
     }
-
-    fun getChannelIndex(channel: Channel) : Int {
-        return channels.indexOf(channel)
-    }
-
 }
