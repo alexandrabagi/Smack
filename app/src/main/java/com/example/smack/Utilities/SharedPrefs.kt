@@ -2,6 +2,7 @@ package com.example.smack.Utilities
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.android.volley.DefaultRetryPolicy
 import com.android.volley.toolbox.Volley
 
 class SharedPrefs(context: Context) {

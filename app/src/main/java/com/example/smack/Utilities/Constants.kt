@@ -1,8 +1,8 @@
 package com.example.smack.Utilities
 
-//const val BASE_URL = "http://10.0.2.2:3005/v1/"
+//const val BASE_URL = "https://10.0.2.2:3005/v1/"
+//const val BASE_URL = "https://127.0.0.1:3005/v1/"
 const val BASE_URL = "https://szandraschattychat.herokuapp.com/v1/"
-//const val SOCKET_URL = "http://10.0.2.2:3005/"
 const val SOCKET_URL = "https://szandraschattychat.herokuapp.com/"
 const val URL_REGISTER = "${BASE_URL}account/register"
 const val URL_LOGIN = "${BASE_URL}account/login"

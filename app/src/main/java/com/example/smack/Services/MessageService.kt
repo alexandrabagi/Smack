@@ -60,25 +60,27 @@ object MessageService {
     }
 
     fun getMessages(channelId: String, complete: (Boolean) -> Unit) {
-        var url = "$URL_GET_MESSAGES$channelId"
+        val url = "$URL_GET_MESSAGES$channelId"
 
-        val messagesRequest = object: JsonArrayRequest(Method.GET, URL_GET_MESSAGES, null, Response.Listener { response ->
+        val messagesRequest = object: JsonArrayRequest(Method.GET, url, null, Response.Listener { response ->
             clearMessages()
             try {
                 for (x in 0 until response.length()) {
                     val message = response.getJSONObject(x)
                     val messageBody = message.getString("messageBody")
                     val channelId = message.getString("channelId")
-                    var id = message.getString("_id")
+                    val id = message.getString("_id")
                     val userName = message.getString("userName")
-                    var userAvatar = message.getString("userAvatar")
-                    var userAvatarColor = message.getString("userAvatarColor")
-                    var timeStamp = message.getString("timeStamp")
+                    val userAvatar = message.getString("userAvatar")
+                    val userAvatarColor = message.getString("userAvatarColor")
+                    val timeStamp = message.getString("timeStamp")
 
                     val newMessage = Message(messageBody, userName, channelId, userAvatar, userAvatarColor,
                         id, timeStamp)
-                    this.messages.add(newMessage)
+                    this.messages.add(newMessage) // TODO: why are we doing this twice?
                 }
+                complete(true)
+
             } catch(e: JSONException) {
                 Log.d("JSON", "EXC: " + e.localizedMessage)
                 complete(false)
